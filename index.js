@@ -83,9 +83,11 @@ app.get("/getTeamPlayers/:teamId", (req, res) => {
 			conn.query("SELECT * from player_info where teamId = " + teamId, (e, r, f) => {
 				if (err) {
 					res.send(err);
+          conn.release();
 				}	
 				else {
 					res.send(r);
+          conn.release();
 				}
 			});
 		}
@@ -108,9 +110,11 @@ app.get("/getLeagueTeams/:leagueId", (req, res) => {
                         conn.query("SELECT * from team_info where leagueId = " + leagueId, (e, r, f) => {
                                 if (err) {
                                         res.send(err);
+                                        conn.release();
                                 }
                                 else {
                                         res.send(r);
+                                        conn.release();
                                 }
                         });
                 }
@@ -131,9 +135,11 @@ app.get("/getLeagues", (req, res) => {
                         conn.query("SELECT * from league_info", (e, r, f) => {
                                 if (err) {
                                         res.send(err);
+                                        conn.release();
                                 }
                                 else {
                                         res.send(r);
+                                        conn.release();
                                 }
                         });
                 }
