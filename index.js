@@ -6,11 +6,11 @@ const cors = require("cors");
 const port = 3001;
 
 const pool = mysql.createPool({
-  	host: "49.50.172.42",
-  	port: "3306",
-  	user: "server",
-  	password: "tlstkddn!",
-  	database: "dksl_live",
+  host: "49.50.172.42",
+  port: "3306",
+  user: "server",
+  password: "tlstkddn!",
+  database: "dksl_live",
 	connectionLimit: 10
 });
 
