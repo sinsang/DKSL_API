@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const mysql = require("mysql");
+const cors = require("cors");
 
 const port = 3001;
 
@@ -12,6 +13,8 @@ const pool = mysql.createPool({
   	database: "dksl_live",
 	connectionLimit: 10
 });
+
+app.use(cors());
 
 app.get("/getPlayerStat/:playerId", (req, res) => {
 	
