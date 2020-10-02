@@ -30,6 +30,7 @@ app.get("/test/:Id", (req, res) => {
 
 });
 
+// Player 관련
 app.get("/getPlayerStat/:playerId", (req, res) => {
   
   var playerId = req.params.playerId;
@@ -170,6 +171,37 @@ app.get("/getPlayerStat/:playerId", (req, res) => {
 
 });
 
+app.get("/getPlayerInfoByName/:playerName", (req, res) => {
+
+  var playerName = req.params.playerName;
+
+  pool.getConnection((err, conn) => {
+
+    if (err){
+      res.send(err);
+      conn,release();
+    }
+    else {
+
+      conn.query("SELECT * from player_info where playerName like \"%" + playerName + "%\"", (e, r, f) => {
+
+        if (err){
+          res.send(err);
+          conn.release();
+        }
+        else{
+          res.send(r);
+          conn.release();
+        }
+
+      });
+      
+    }
+
+  });
+
+});
+
 app.get("/getTeamPlayers/:teamId", (req, res) => {
 
 	var teamId = req.params.teamId;
@@ -198,6 +230,8 @@ app.get("/getTeamPlayers/:teamId", (req, res) => {
 		
 });
 
+
+// Team 관련
 app.get("/getTeamInfo/:teamId", (req, res) => {
 
   var teamId = req.params.teamId;
@@ -251,7 +285,7 @@ app.get("/getTeamInfoByName/:teamName", (req, res) => {
         }
 
       });
-      
+
     }
 
   });
@@ -306,28 +340,38 @@ app.get("/getLeagueTeams/:leagueId", (req, res) => {
 
 });
 
+app.get("/getTeams", (req, res) => {
+
+  pool.getConnection((err, conn) => {
+
+    if (err){
+      res.send(err);
+      conn.release();
+    }
+    else{
+
+      conn.query("SELECT team_info.teamId, team_info.teamName, league_info.leagueName from team_info join league_info using(leagueId)", (e, r, f) => {
+
+        if (err){
+          res.send(err);
+          conn.release();
+        }
+        else{
+          res.send(r);
+          conn.release();
+        }
+
+      });
+
+    }
+
+  });
+
+});
+
+
+// league 관련
 app.get("/getLeagues", (req, res) => {
-
-        pool.getConnection((err, conn) => {
-
-                if (err) {
-                        res.send(err);
-                        conn.relaese();
-                }
-                else {
-                        conn.query("SELECT * from league_info", (e, r, f) => {
-                                if (err) {
-                                        res.send(err);
-                                        conn.release();
-                                }
-                                else {
-                                        res.send(r);
-                                        conn.release();
-                                }
-                        });
-                }
-
-        });
 
   pool.getConnection((err, conn) => {
 
