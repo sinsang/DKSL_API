@@ -206,10 +206,11 @@ app.get("/getTeamInfo/:teamId", (req, res) => {
 
     if (err) {
       res.send(err);
-      conn.relaese();
+      conn.release();
     }
     else {
       conn.query("SELECT * from team_info where teamId = " + teamId, (e, r, f) => {
+        
         if (err) {
           res.send(err);
           conn.release();
@@ -218,11 +219,43 @@ app.get("/getTeamInfo/:teamId", (req, res) => {
           res.send(r);
           conn.release();
         }
+
       });
     }
 
   });
     
+});
+
+app.get("/getTeamInfoByName/:teamName", (req, res) => {
+
+  var teamName = req.params.teamName;
+
+  pool.getConnection((err, conn) => {
+
+    if (err){
+      res.send(err);
+      conn,release();
+    }
+    else {
+
+      conn.query("SELECT * from team_info where teamName like \"%" + teamName + "%\"", (e, r, f) => {
+
+        if (err){
+          res.send(err);
+          conn.release();
+        }
+        else{
+          res.send(r);
+          conn.release();
+        }
+
+      });
+      
+    }
+
+  });
+
 });
 
 app.get("/getLeagueTeams/:leagueId", (req, res) => {
