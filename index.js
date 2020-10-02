@@ -183,7 +183,7 @@ app.get("/getPlayerInfoByName/:playerName", (req, res) => {
     }
     else {
 
-      conn.query("SELECT * from player_info where playerName like \"%" + playerName + "%\"", (e, r, f) => {
+      conn.query("SELECT player_info.*, team_info.teamName from player_info join team_info using(teamId) where playerName like \"%" + playerName + "%\"", (e, r, f) => {
 
         if (err){
           res.send(err);
@@ -228,6 +228,35 @@ app.get("/getTeamPlayers/:teamId", (req, res) => {
 
 	});
 		
+});
+
+app.get("/getPlayerInfo", (req, res) => {
+
+  pool.getConnection((err, conn) => {
+
+    if (err){
+      res.send(err);
+      conn.release();
+    }
+    else{
+
+      conn.query("SELECT player_info.*, team_info.teamName from player_info join team_info using(teamId)", (e, r, f) => {
+
+        if (err){
+          res.send(err);
+          conn.release();
+        }
+        else{
+          res.send(r);
+          conn.release();
+        }
+
+      });
+
+    }
+
+  });
+
 });
 
 
