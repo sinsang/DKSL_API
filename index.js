@@ -183,7 +183,7 @@ app.get("/getPlayerInfoByName/:playerName", (req, res) => {
     }
     else {
 
-      conn.query("SELECT player_info.*, team_info.teamName from player_info join team_info using(teamId) where playerName like \"%" + playerName + "%\"", (e, r, f) => {
+      conn.query("SELECT player_info.*, team_info.teamName from player_info join team_info using(teamId) where playerName like \"%" + playerName + "%\" ORDER BY player_info.playerName", (e, r, f) => {
 
         if (err){
           res.send(err);
@@ -240,7 +240,7 @@ app.get("/getPlayerInfo", (req, res) => {
     }
     else{
 
-      conn.query("SELECT player_info.*, team_info.teamName from player_info join team_info using(teamId)", (e, r, f) => {
+      conn.query("SELECT player_info.*, team_info.teamName from player_info join team_info using(teamId) ORDER BY player_info.playerName", (e, r, f) => {
 
         if (err){
           res.send(err);
