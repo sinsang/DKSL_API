@@ -230,7 +230,7 @@ app.get("/getTeamPlayers/:teamId", (req, res) => {
 		
 });
 
-app.get("/getPlayerInfo", (req, res) => {
+app.get("/getAllPlayerInfo", (req, res) => {
 
   pool.getConnection((err, conn) => {
 
@@ -259,6 +259,63 @@ app.get("/getPlayerInfo", (req, res) => {
 
 });
 
+app.get("/getAllPlayerBatterStat", (req, res) => {
+
+  pool.getConnection((err, conn) => {
+
+    if (err){
+      res.send(err);
+      conn.release();
+    }
+    else {
+
+      conn.query("SELECT player_info.playerName, team_info.teamName, batter_stat.* from player_info join team_info using(teamId) join batter_stat using(playerId)", (e, r, f) => {
+
+        if (e){
+          res.send(e);
+          conn.release();
+        }
+        else{
+          res.send(r);
+          conn.release();
+        }
+
+      });
+
+    }
+
+  });
+
+});
+
+app.get("/getAllPlayerPitcherStat", (req, res) => {
+
+  pool.getConnection((err, conn) => {
+
+    if (err){
+      res.send(err);
+      conn.release();
+    }
+    else {
+
+      conn.query("SELECT player_info.playerName, team_info.teamName, pitcher_stat.* from player_info join team_info using(teamId) join pitcher_stat using(playerId)", (e, r, f) => {
+
+        if (e){
+          res.send(e);
+          conn.release();
+        }
+        else{
+          res.send(r);
+          conn.release();
+        }
+
+      });
+
+    }
+
+  });
+
+});
 
 // Team 관련
 app.get("/getTeamInfo/:teamId", (req, res) => {
