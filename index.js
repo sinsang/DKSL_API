@@ -317,6 +317,8 @@ app.get("/getAllPlayerPitcherStat", (req, res) => {
 
 });
 
+app.post("/g")
+
 // Team 관련
 app.get("/getTeamInfo/:teamId", (req, res) => {
 
