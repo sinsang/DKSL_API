@@ -362,10 +362,6 @@ app.get("/getAllPlayerPitcherStat", (req, res) => {
 
           result.total = [];
           result.yearly = r.slice();
-
-          for (i in result.yearly){
-            result.yearly[i].IP = parseInt(result.yearly[i].IP / 3) + ((result.yearly[i].IP % 3) * 0.1);
-          }
           
           for (i in r){
 
@@ -401,6 +397,10 @@ app.get("/getAllPlayerPitcherStat", (req, res) => {
 
             result.total.push(player);
 
+          }
+
+          for (i in result.yearly){
+            result.yearly[i].IP = parseInt(result.yearly[i].IP / 3) + ((result.yearly[i].IP % 3) * 0.1);
           }
           
           res.send(result);
@@ -521,11 +521,6 @@ app.get("/getTeamPlayerPitcherStat/:teamId", (req, res) => {
 
           result.total = [];
           result.yearly = r.slice();
-
-          console.log(result.yearly[0]);
-          for (i in result.yearly){
-            result.yearly[i].IP = parseInt(result.yearly[i].IP / 3) + ((result.yearly[i].IP % 3) * 0.1);
-          }
           
           for (i in r){
 
@@ -544,7 +539,6 @@ app.get("/getTeamPlayerPitcherStat/:teamId", (req, res) => {
                   switch(k){
                     case "playerId": case "playerName": case "teamId": case "teamName": case "year": 
                     case "ERA": break;
-                      break;
                     default:
                       if (player[k] == undefined){
                         player[k] = 0;
@@ -557,10 +551,15 @@ app.get("/getTeamPlayerPitcherStat/:teamId", (req, res) => {
             }
 
             player.ERA = (player.ER * 9) / (player.IP / 3);
+            console.log(player.ER, player.IP/3);
             player.IP = parseInt(player.IP / 3) + ((player.IP % 3) * 0.1);
 
             result.total.push(player);
 
+          }
+
+          for (i in result.yearly){
+            result.yearly[i].IP = parseInt(result.yearly[i].IP / 3) + ((result.yearly[i].IP % 3) * 0.1);
           }
           
           res.send(result);
