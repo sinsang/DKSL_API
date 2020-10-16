@@ -269,14 +269,62 @@ app.get("/getAllPlayerBatterStat", (req, res) => {
     }
     else {
 
-      conn.query("SELECT player_info.playerName, team_info.teamName, batter_stat.* from player_info join team_info using(teamId) join batter_stat using(playerId)", (e, r, f) => {
+      conn.query("SELECT player_info.playerName, player_info.playerId, team_info.teamName, team_info.teamId, batter_stat.* from player_info join team_info using(teamId) join batter_stat using(playerId)", (e, r, f) => {
+
+        var result = [];
 
         if (e){
           res.send(e);
           conn.release();
         }
         else{
-          res.send(r);
+          
+          for (i in r){
+
+            var player = {};
+
+            player.playerId = r[i].playerId;
+            player.playerName = r[i].playerName;
+            player.teamName = r[i].teamName;
+            player.total = {};
+            player.yearly = [];
+
+            for (j in r){
+              if (player.playerId == r[j].playerId){
+                var tmp = r[j];
+                r.splice(j*1, 1);
+                player.yearly.push(tmp);
+              }
+            }
+
+            for (j in player.yearly){
+              for (k in player.yearly[j]){
+                switch(k){
+                  case "playerId": case "playerName": case "teamId": case "teamName": case "year": 
+                  case "AVG": case "OBP": case "SLG": case "OPS": case "BABIP": 
+                    break;
+                  default:
+                    if (player.total[k] == undefined){
+                      player.total[k] = 0;
+                    } 
+                    player.total[k] += player.yearly[j][k];
+                }
+              }
+            }
+
+            player.total["AVG"] = player.total["H"] / player.total["AB"];
+            player.total["OBP"] = (player.total["H"] + player.total["BB"] + player.total["HBP"]) / player.total["PA"];
+            player.total["SLG"] = player.total["TB"] / player.total["AB"];
+            player.total["OPS"] = player.total["OBP"] + player.total["SLG"];
+            if ((player.total["AB"]-player.total["SO"]-player.total["HR"]+player.total["SF"]) > 0)
+              player.total["BABIP"] = (player.total["H"]-player.total["HR"])/(player.total["AB"]-player.total["SO"]-player.total["HR"]+player.total["SF"]);
+
+
+            result.push(player);
+
+          }
+          
+          res.send(result);
           conn.release();
         }
 
@@ -298,14 +346,62 @@ app.get("/getAllPlayerPitcherStat", (req, res) => {
     }
     else {
 
-      conn.query("SELECT player_info.playerName, team_info.teamName, pitcher_stat.* from player_info join team_info using(teamId) join pitcher_stat using(playerId)", (e, r, f) => {
+      conn.query("SELECT player_info.playerName, player_info.playerId, team_info.teamName, team_info.teamId, pitcher_stat.* from player_info join team_info using(teamId) join pitcher_stat using(playerId)", (e, r, f) => {
+
+        var result = [];
 
         if (e){
           res.send(e);
           conn.release();
         }
         else{
-          res.send(r);
+          
+          for (i in r){
+
+            var player = {};
+
+            player.playerId = r[i].playerId;
+            player.playerName = r[i].playerName;
+            player.teamName = r[i].teamName;
+            player.total = {};
+            player.yearly = [];
+
+            for (j in r){
+              if (player.playerId == r[j].playerId){
+                var tmp = r[j];
+                r.splice(j*1, 1);
+                player.yearly.push(tmp);
+              }
+            }
+
+            for (j in player.yearly){
+              for (k in player.yearly[j]){
+                switch(k){
+                  case "playerId": case "playerName": case "teamId": case "teamName": case "year": 
+                  case "ERA": break;
+                    break;
+                  default:
+                    if (player.total[k] == undefined){
+                      player.total[k] = 0;
+                    } 
+                    player.total[k] += player.yearly[j][k];
+                }
+              }
+            }
+
+            player.total.ERA = (player.total.ER * 9) / (player.total.IP / 3);
+            player.total.IP = parseInt(player.total.IP / 3) + ((player.total.IP % 3) * 0.1);
+
+            for (i in player.yearly){
+              player.yearly[i].IP = parseInt(player.yearly[i].IP / 3) + ((player.yearly[i].IP % 3) * 0.1);
+            }
+
+
+            result.push(player);
+
+          }
+          
+          res.send(result);
           conn.release();
         }
 
@@ -317,7 +413,164 @@ app.get("/getAllPlayerPitcherStat", (req, res) => {
 
 });
 
-app.post("/g")
+app.get("/getTeamPlayerBatterStat/:teamId", (req, res) => {
+
+  var teamId = req.params.teamId;
+
+  pool.getConnection((err, conn) => {
+
+    if (err){
+      res.send(err);
+      conn.release();
+    }
+    else {
+
+      conn.query("SELECT player_info.playerName, player_info.playerId, team_info.teamName, batter_stat.* from player_info join team_info using(teamId) join batter_stat using(playerId) where teamId = " + teamId + " order by playerName", (e, r, f) => {
+
+        var result = [];
+
+        if (e){
+          res.send(e);
+          conn.release();
+        }
+        else{
+          
+          for (i in r){
+
+            var player = {};
+
+            player.playerId = r[i].playerId;
+            player.playerName = r[i].playerName;
+            player.teamName = r[i].teamName;
+            player.total = {};
+            player.yearly = [];
+
+            for (j in r){
+              if (player.playerId == r[j].playerId){
+                var tmp = r[j];
+                r.splice(j*1, 1);
+                player.yearly.push(tmp);
+              }
+            }
+
+            for (j in player.yearly){
+              for (k in player.yearly[j]){
+                switch(k){
+                  case "playerId": case "playerName": case "teamId": case "teamName": case "year": 
+                  case "AVG": case "OBP": case "SLG": case "OPS": case "BABIP": 
+                    break;
+                  default:
+                    if (player.total[k] == undefined){
+                      player.total[k] = 0;
+                    } 
+                    player.total[k] += player.yearly[j][k];
+                }
+              }
+            }
+
+            player.total["AVG"] = player.total["H"] / player.total["AB"];
+            player.total["OBP"] = (player.total["H"] + player.total["BB"] + player.total["HBP"]) / player.total["PA"];
+            player.total["SLG"] = player.total["TB"] / player.total["AB"];
+            player.total["OPS"] = player.total["OBP"] + player.total["SLG"];
+            if ((player.total["AB"]-player.total["SO"]-player.total["HR"]+player.total["SF"]) > 0)
+              player.total["BABIP"] = (player.total["H"]-player.total["HR"])/(player.total["AB"]-player.total["SO"]-player.total["HR"]+player.total["SF"]);
+
+
+            result.push(player);
+
+          }
+
+          res.send(result);
+          conn.release();
+        }
+
+      });
+
+    }
+
+  });
+
+});
+
+
+app.get("/getTeamPlayerPitcherStat/:teamId", (req, res) => {
+
+  var teamId = req.params.teamId;
+
+  pool.getConnection((err, conn) => {
+
+    if (err){
+      res.send(err);
+      conn.release();
+    }
+    else {
+
+      conn.query("SELECT player_info.playerName, team_info.teamName, pitcher_stat.* from player_info join team_info using(teamId) join pitcher_stat using(playerId) where teamId = " + teamId , (e, r, f) => {
+
+        var result = [];
+
+        if (e){
+          res.send(e);
+          conn.release();
+        }
+        else{
+          
+          for (i in r){
+
+            var player = {};
+
+            player.playerId = r[i].playerId;
+            player.playerName = r[i].playerName;
+            player.teamName = r[i].teamName;
+            player.total = {};
+            player.yearly = [];
+
+            for (j in r){
+              if (player.playerId == r[j].playerId){
+                var tmp = r[j];
+                r.splice(j*1, 1);
+                player.yearly.push(tmp);
+              }
+            }
+
+            for (j in player.yearly){
+              for (k in player.yearly[j]){
+                switch(k){
+                  case "playerId": case "playerName": case "teamId": case "teamName": case "year": 
+                  case "ERA": break;
+                    break;
+                  default:
+                    if (player.total[k] == undefined){
+                      player.total[k] = 0;
+                    } 
+                    player.total[k] += player.yearly[j][k];
+                }
+              }
+            }
+
+            player.total.ERA = (player.total.ER * 9) / (player.total.IP / 3);
+            player.total.IP = parseInt(player.total.IP / 3) + ((player.total.IP % 3) * 0.1);
+
+            for (i in player.yearly){
+              player.yearly[i].IP = parseInt(player.yearly[i].IP / 3) + ((player.yearly[i].IP % 3) * 0.1);
+            }
+
+
+            result.push(player);
+
+          }
+          
+          res.send(result);
+          conn.release();
+        }
+
+      });
+
+    }
+
+  });
+
+});
 
 // Team 관련
 app.get("/getTeamInfo/:teamId", (req, res) => {
