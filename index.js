@@ -427,7 +427,7 @@ app.get("/getTeamPlayerBatterStat/:teamId", (req, res) => {
     }
     else {
 
-      conn.query("SELECT player_info.playerName, player_info.playerId, team_info.teamName, batter_stat.* from player_info join team_info using(teamId) join batter_stat using(playerId) where teamId = " + teamId + " order by playerName", (e, r, f) => {
+      conn.query("SELECT player_info.playerName, player_info.playerId, team_info.teamName, batter_stat.* from player_info join team_info using(teamId) join batter_stat using(playerId) where teamId = " + teamId, (e, r, f) => {
 
         if (e){
           res.send(e);
