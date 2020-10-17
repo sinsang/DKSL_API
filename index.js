@@ -17,7 +17,6 @@ const pool = mysql.createPool({
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended : true}));
 
 app.get("/test/:Id", (req, res) => {
 
@@ -728,9 +727,70 @@ app.listen(port, () => console.log("on " + port));
 // 문자중계 관련
 app.post("/saveGame", (req, res) => {
 
-  console.log("받았당");
-  console.log(req.body.game);
+  pool.getConnection((err, conn) =>{
 
-  //pool.getConnection((err, conn) =>{});
+    if (err) {
+      console.log(err);
+      conn.release();
+    }
+    else {
 
+      var game = req.body.game;
+
+      conn.query("insert into game_info(info) values (\'" + JSON.stringify(game) + "\')", (e, r, f) => {
+
+        if (e) {
+          console.log(e);
+          conn.release();
+        }
+        else {
+          console.log("done");
+          conn.release();
+        }
+
+      });
+
+    }
+
+  });
+
+});
+
+app.get("/getPastGames", (req, res) => {
+
+  pool.getConnection((err, conn) =>{
+
+    if (err) {
+      res.sendg(err);
+      conn.release();
+    }
+    else {
+
+      conn.query("select * from game_info", (e, r, f) => {
+
+        if (e) {
+          res.send(e);
+          conn.release();
+        }
+        else {
+
+          var result = [];
+
+          for (i in r){
+            var tmp = {};
+            tmp.gameId = r[i].gameId;
+
+            tmp.info = r[i].info;
+            result.push(tmp);
+          }
+
+          res.send(result);
+          conn.release();
+        }
+
+      });
+
+    }
+
+  });
 });
