@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const port = 3001;
 
@@ -15,6 +16,8 @@ const pool = mysql.createPool({
 });
 
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended : true}));
 
 app.get("/test/:Id", (req, res) => {
 
@@ -551,7 +554,6 @@ app.get("/getTeamPlayerPitcherStat/:teamId", (req, res) => {
             }
 
             player.ERA = (player.ER * 9) / (player.IP / 3);
-            console.log(player.ER, player.IP/3);
             player.IP = parseInt(player.IP / 3) + ((player.IP % 3) * 0.1);
 
             result.total.push(player);
@@ -639,26 +641,6 @@ app.get("/getLeagueTeams/:leagueId", (req, res) => {
 
 	var leagueId = req.params.leagueId;
 
-        pool.getConnection((err, conn) => {
-
-                if (err) {
-                        res.send(err);
-                        conn.relaese();
-                }
-                else {
-                        conn.query("SELECT * from team_info where leagueId = " + leagueId, (e, r, f) => {
-                                if (err) {
-                                        res.send(err);
-                                        conn.release();
-                                }
-                                else {
-                                        res.send(r);
-                                        conn.release();
-                                }
-                        });
-                }
-
-
     pool.getConnection((err, conn) => {
 
       if (err) {
@@ -667,6 +649,7 @@ app.get("/getLeagueTeams/:leagueId", (req, res) => {
       }
       else {
         conn.query("SELECT * from team_info where leagueId = " + leagueId, (e, r, f) => {
+
           if (err) {
             res.send(err);
             conn.release();
@@ -675,13 +658,13 @@ app.get("/getLeagueTeams/:leagueId", (req, res) => {
             res.send(r);
             conn.release();
           }
+
         });
       }
     });
 
-  });
-
 });
+
 
 app.get("/getTeams", (req, res) => {
 
@@ -739,3 +722,15 @@ app.get("/getLeagues", (req, res) => {
 });
 
 app.listen(port, () => console.log("on " + port));
+
+
+
+// 문자중계 관련
+app.post("/saveGame", (req, res) => {
+
+  console.log("받았당");
+  console.log(req.body.game);
+
+  //pool.getConnection((err, conn) =>{});
+
+});
